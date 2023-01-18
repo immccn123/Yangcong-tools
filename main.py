@@ -10,8 +10,10 @@ INTRO_S = R'''
   \::::_\/ \:\ \/_/\\:: ___::\ \\__::::\/   \::\ \   \:\ \ \ \\:\ \ \ \\:\ \____  
     \::\ \  \:\_\ \ \\: \ \\::\ \            \::\ \   \:\_\ \ \\:\_\ \ \\:\/___/\ 
      \__\/   \_____\/ \__\/ \::\/             \__\/    \_____\/ \_____\/ \_____\/ 
-COPYRIGHT (C) immccn123 <Youxi Luo, immccn123@outlook.com> 2023
-Licensed under GPLv3.
+      Licensed under GPLv3.
+      If the project violates your rights,
+      please contact immccn123（at）outlook.com for removal.
+      https://github.com/immccn123/Yangcong-tools
 ----------------------------------------------------------------------------------------
 '''
 
