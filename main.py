@@ -142,12 +142,13 @@ if os.path.exists('username') and os.path.exists('password'):
     usernameFile = open('username', 'r')
     passwordFile = open('password', 'r')
     while True:
-        un = usernameFile.readline()
-        pw = passwordFile.readline()
+        un = usernameFile.readline()[:-1]
+        pw = passwordFile.readline()[:-1]
         if (not un) and (not pw):
             break
+        print('[Multi User] 正在执行用户', un)
         run(un, pw)
 else:
-    un = input('username: ')
-    pw = input('password: ')
+    un = input('用户名/手机号：')
+    pw = input('密码：')
     run(un, pw)
