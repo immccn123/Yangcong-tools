@@ -10,6 +10,9 @@ Obviously, this project is only useful for some students in mainland China, so t
 
 If the project violates your rights, please contact immccn123（at）outlook.com for removal.
 
+[Join our Telegram group](https://t.me/+3Crz6ciu5ABjZWU1)
+
+[使用方法](docs/usage.md)
 
 ## Todos
 - [X] 视频作业 (Type 0)

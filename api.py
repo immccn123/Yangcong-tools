@@ -39,6 +39,7 @@ def login(username, password):
     else:
         AUTH_TOKEN = ctx.headers.get('authorization')
         headers['authorization'] = AUTH_TOKEN
+        return AUTH_TOKEN
 
 def get_unfinish_homework():
     if AUTH_TOKEN != '':
