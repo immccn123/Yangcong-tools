@@ -119,17 +119,14 @@ def run():
                         submit_practice_problem(hwid, [{
                             'problemId': p['id'],
                             'answer': ans,
-                            # 'type': p['type'],
                             'duration': randint(1, 12),
                         }], 'finished')
                     else:
                         submit_practice_problem(hwid, [{
                             'problemId': p['id'],
                             'answer': ans,
-                            # 'type': p['type'],
                             'duration': randint(1, 12),
                         }], 'unfinished')
-                exit()
             elif hw['type'] == 3:
                 print('[Exam] 正在完成', hw['name'], hw['id'])
                 print('\t正在获取试题列表')
