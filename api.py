@@ -144,3 +144,25 @@ def commit_problem_progress(group_id, is_finished: bool, problems):
                 'problems': problems
             }
         )
+
+def get_practice_problems(homework_id):
+    if AUTH_TOKEN != '':
+        return json.loads(requests.get(
+            url=f'https://school-api.yangcong345.com/student/practices/{homework_id}',
+            headers=headers,
+        ).content.decode('utf-8'))['problems']
+
+'''
+`state`: 'unfinished' | 'finished'
+'''
+def submit_practice_problem(homework_id, problems, state):
+    if AUTH_TOKEN != '':
+        requests.put(
+            url='https://school-api.yangcong345.com/student/practices',
+            headers=headers,
+            json={
+                'homeworkId': homework_id,
+                'problems': problems,
+                'state': state,
+            }
+        )

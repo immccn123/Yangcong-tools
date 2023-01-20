@@ -16,8 +16,9 @@ If the project violates your rights, please contact immccn123（at）outlook.com
 
 ## Todos
 - [X] 视频作业 (Type 0)
-- [ ] 课后习题/练习任务 Type 1 (Unknown)
-- [X] 精测作业 (Type 2)
+- [X] 课后习题/练习任务 Type 1
+- [ ] 未知作业类型 (Type 2)
+- [X] 精测作业 (Type 3)
 - [ ] Special Course
 
 ## 目前可以达到的效果

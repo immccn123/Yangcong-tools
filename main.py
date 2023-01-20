@@ -89,6 +89,47 @@ def run():
                             else:
                                 print('\t\t无习题。')
                     print('\t已完成', topic['name'], topic['id'])
+            elif hw['type'] == 1:
+                print('[Practice] 正在完成', hw['name'], hw['id'])
+                print('\t正在获取试题列表')
+                probs = get_practice_problems(hwid)
+                print('\t获取到', len(probs), '个试题')
+                for pi in range(len(probs)):
+                    p = probs[pi]
+                    ans = []
+                    if p['type'] == 'single_choice' or p['type'] == 'exam':
+                        print('\t\tSingle choice')
+                        for choice in p['choices'][0]:
+                            if choice['correct'] == True:
+                                ans.append({'body': choice['body'], 'no': 0})
+                                break
+                    elif p['type'] == 'multi_choice':
+                        print('\t\tMulti Choices')
+                        ans = []
+                        for choice in p['choices'][0]:
+                            if choice['correct'] == True:
+                                ans.append({'body': choice['body'], 'no': 0})
+                    elif p['type'] == 'multi_blank' or p['type'] == 'hybrid':
+                        print('\t\tMulti blank')
+                        for s in p['blanks']:
+                            ans.append({'body': s, 'no': 0})
+                    else:
+                        bug_report_ukp(p)
+                    if pi == len(probs) - 1:
+                        submit_practice_problem(hwid, [{
+                            'problemId': p['id'],
+                            'answer': ans,
+                            # 'type': p['type'],
+                            'duration': randint(1, 12),
+                        }], 'finished')
+                    else:
+                        submit_practice_problem(hwid, [{
+                            'problemId': p['id'],
+                            'answer': ans,
+                            # 'type': p['type'],
+                            'duration': randint(1, 12),
+                        }], 'unfinished')
+                exit()
             elif hw['type'] == 3:
                 print('[Exam] 正在完成', hw['name'], hw['id'])
                 print('\t正在获取试题列表')
@@ -99,7 +140,7 @@ def run():
                 for pi in range(len(problems)):
                     p = problems[pi]
                     ans = []
-                    if p['type'] == 'single_choice':
+                    if p['type'] == 'single_choice' or p['type'] == 'exam':
                         print('\t\tSingle choice')
                         for choice in p['choices'][0]:
                             if choice['correct'] == 'true' or choice['correct'] == True:
@@ -127,8 +168,8 @@ def run():
                     print('\t\tSubmitted', p['id'])
         print('已完成', hw['name'], hwid)
 
+userinfo = []
 try:
-    userinfo = []
     with open('users.json', 'r', encoding='utf-8') as f:
         userinfo = json.load(f)
     for user in userinfo:
@@ -144,6 +185,6 @@ except FileNotFoundError:
     un = input('用户名/手机号：')
     pw = input('密码：')
     run(un, pw)
-except (KeyError, TypeError, json.decoder.JSONDecodeError) as E:
+except (json.decoder.JSONDecodeError) as E:
     print(E)
     print('多用户配置文件格式有误。')
