@@ -181,7 +181,8 @@ try:
 except FileNotFoundError:
     un = input('用户名/手机号：')
     pw = input('密码：')
-    run(un, pw)
+    login(un, pw)
+    run()
 except (json.decoder.JSONDecodeError) as E:
     print(E)
     print('多用户配置文件格式有误。')
