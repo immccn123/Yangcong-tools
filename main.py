@@ -30,7 +30,7 @@ def bug_report_ukp(msg):
     exit(3)
 
 def run():
-    homework = get_unfinish_homework()
+    homework = get_unfinished_homework()
     exp_hm = get_expired_homework()
     homework: list = homework['homeworkList'] + exp_hm['homeworkList']
     print('已获取到', homework.__len__(), '个作业')

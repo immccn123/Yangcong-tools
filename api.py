@@ -41,7 +41,7 @@ def login(username, password):
         headers['authorization'] = AUTH_TOKEN
         return AUTH_TOKEN
 
-def get_unfinish_homework():
+def get_unfinished_homework():
     if AUTH_TOKEN != '':
         ctx = requests.get(
             url='https://school-api.yangcong345.com/student/ai-homework/all/unfinish',
@@ -57,7 +57,7 @@ def get_expired_homework():
         )
         return json.loads(ctx.content.decode('utf-8'))
 
-
+# TODO: Rename -> `get_topic_detail`
 def get_detail(topic_id):
     if AUTH_TOKEN != '':
         ctx = requests.get(
@@ -96,7 +96,7 @@ def submit_video(topic_id, homework_id, video_id, duration):
             }
         )
 
-
+# TODO: Rename -> `submit_video_problem`
 def submit_problem(problem_id,  homework_id, topic_id, answers):
     if AUTH_TOKEN != '':
         return requests.post(
