@@ -57,14 +57,15 @@ def get_expired_homework():
         )
         return json.loads(ctx.content.decode('utf-8'))
 
-# TODO: Rename -> `get_topic_detail`
-def get_detail(topic_id):
+
+def get_topic_detail(topic_id):
     if AUTH_TOKEN != '':
         ctx = requests.get(
             url=f'https://school-api.yangcong345.com/course/topics/{topic_id}/detail-universal',
             headers=headers
         )
         return json.loads(ctx.content.decode('utf-8'))
+
 
 def submit_video(topic_id, homework_id, video_id, duration):
     if AUTH_TOKEN != '':
@@ -164,5 +165,67 @@ def submit_practice_problem(homework_id, problems, state):
                 'homeworkId': homework_id,
                 'problems': problems,
                 'state': state,
+            }
+        )
+
+# 假期特殊作业
+
+def get_vacations():
+    if AUTH_TOKEN != '':
+        ctx = requests.get(
+            url='https://school-api.yangcong345.com/vacation/student/homework/list',
+            headers=headers,
+        )
+        ctx = ctx.content.decode('utf-8')
+        return json.loads(ctx)['vacations']
+
+def get_vacation_timelines(vacation_id):
+    if AUTH_TOKEN != '':
+        ctx = requests.get(
+            url=f'https://school-api.yangcong345.com/vacation/student/homework/timeline/task/list?measuringID={vacation_id}',
+            headers=headers,
+        )
+        ctx = ctx.content.decode('utf-8')
+        return json.loads(ctx)['timeLines']
+
+
+def get_vacation_video_detail(topic_id, task_id):
+    if AUTH_TOKEN != '':
+        ctx = requests.get(
+            url=f'https://school-api.yangcong345.com/course/topics/{topic_id}/detail-video?taskID=f{task_id}',
+            headers=headers
+        )
+        return json.loads(ctx.content.decode('utf-8'))
+
+
+def submit_vacation_video(topic_id, video_id, task_id, duration):
+    if AUTH_TOKEN != '':
+        requests.put(
+            url='https://school-api.yangcong345.com/vacation/student/homework/user-topic-video-record',
+            headers=headers,
+            json={
+                "taskID": task_id,
+                "videoID": video_id,
+                "topicID": topic_id,
+                "duration": duration * 1000,
+                "timePoint": duration,
+                "finished": True
+            }
+        )
+
+def submit_vacation_practice(problem_id, topic_id, task_id, pool, is_finished: bool, answers: list):
+    if AUTH_TOKEN != '':
+        requests.post(
+            url='https://school-api.yangcong345.com/vacation/student/homework/user-topic-problem-record',
+            headers=headers,
+            json={
+                "taskID": task_id,
+                "problemId": problem_id,
+                "topicId": topic_id,
+                "correct": True,
+                "duration": randint(1000, 10000),
+                "answers": answers,
+                "pool": pool,
+                "finished": is_finished
             }
         )

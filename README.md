@@ -20,6 +20,7 @@ If the project violates your rights, please contact immccn123（at）outlook.com
 - [ ] 未知作业类型 (Type 2)
 - [X] 精测作业 (Type 3)
 - [ ] Special Course
+- [ ] 假期作业
 
 ## 目前可以达到的效果
 - 视频作业/精测作业 100% 准确率 + 100% 认真完成视频观看
