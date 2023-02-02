@@ -14,16 +14,20 @@ If the project violates your rights, please contact immccn123（at）outlook.com
 
 [使用方法](docs/usage.md) [开发文档](docs/development.md)
 
+[致谢](https://github.com/immccn123/Yangcong-tools/wiki/%E8%87%B4%E8%B0%A2-Acknowledgement)
+
 ## Todos
 - [X] 视频作业 (Type 0)
 - [X] 课后习题/练习任务 (Type 1)
 - [ ] 未知作业类型 (Type 2)
 - [X] 精测作业 (Type 3)
-- [ ] Special Course
 - [ ] 假期作业
+  - [X] 视频作业 (Type 1)
+  - [ ] 测试作业（不打算完成，PR's Welcome）
 
 ## 目前可以达到的效果
-- 视频作业/精测作业 100% 准确率 + 100% 认真完成视频观看
+- 视频作业/精测作业/课后习题 100% 准确率 + 100% 认真完成视频观看（并且超长）
+- 完成假期作业中的视频作业
 
 ## 永远不可能达到的效果
 - 修改已完成作业的结果
@@ -43,7 +47,5 @@ az... 随便好了。注意码风。代码很难读，自己看着办（\
 <img src="https://static-cdn.immccn123.xyz/sponser-ali.jpg" width="210">
 <img src="https://static-cdn.immccn123.xyz/sponser-wec.png" width="210">
 </figure>
-
-后面还会有个捐助列表，回头再加
 
 联系我：[本站点](https://immccn123.xyz)页脚处

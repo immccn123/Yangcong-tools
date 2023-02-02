@@ -198,7 +198,6 @@ def complete_vacation(vc):
                                 ans = p['blanks']
                             else:
                                 bug_report_ukp(p)
-                            # print(p)
                             submit_vacation_practice(
                                 p['problemId'],
                                 topic['id'],
@@ -216,9 +215,6 @@ def run():
     print('已获取到', homework.__len__(), '个作业')
     for hw in homework:
         complete_homework(hw)
-    # return
-    print('下列功能正在调试中！！！不保证可用性！！！')
-    input('按下回车继续')
     vacations = get_vacations()
     print('检测到', len(vacations), '个假期课程')
     for vc in vacations:
