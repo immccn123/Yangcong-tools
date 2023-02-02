@@ -29,7 +29,7 @@ def bug_report_ukp(msg):
     print('----------- END -----------')
     exit(3)
 
-def complete_topic(topic):
+def complete_topic(hwid, topic):
     tpid = topic['id']
     print('\t正在完成', topic['name'], topic['id'])
     print('\t话题完成情况: ', topic['state'])
@@ -78,64 +78,64 @@ def complete_topic(topic):
                 print('\t\t无习题。')
 
 
-def complete_practice(probs):
+def complete_practice(hwid, probs):
     for pi in range(len(probs)):
-    p = probs[pi]
-    ans = []
-    if p['type'] == 'single_choice' or p['type'] == 'exam':
-        print('\t\tSingle choice')
-        for choice in p['choices'][0]:
-            if choice['correct'] == True:
-                ans.append({'body': choice['body'], 'no': 0})
-                break
-    elif p['type'] == 'multi_choice':
-        print('\t\tMulti Choices')
+        p = probs[pi]
         ans = []
-        for choice in p['choices'][0]:
-            if choice['correct'] == True:
-                ans.append({'body': choice['body'], 'no': 0})
-    elif p['type'] == 'multi_blank' or p['type'] == 'single_blank' or p['type'] == 'hybrid':
-        print('\t\tMulti blank')
-        for s in p['blanks']:
-            ans.append({'body': s, 'no': 0})
-    else:
-        bug_report_ukp(p)
-    if pi == len(probs) - 1:
-        submit_practice_problem(hwid, [{
-            'problemId': p['id'],
-            'answer': ans,
-            'duration': randint(1, 12),
-        }], 'finished')
-    else:
-        submit_practice_problem(hwid, [{
-            'problemId': p['id'],
-            'answer': ans,
-            'duration': randint(1, 12),
-        }], 'unfinished')
+        if p['type'] == 'single_choice' or p['type'] == 'exam':
+            print('\t\tSingle choice')
+            for choice in p['choices'][0]:
+                if choice['correct'] == True:
+                    ans.append({'body': choice['body'], 'no': 0})
+                    break
+        elif p['type'] == 'multi_choice':
+            print('\t\tMulti Choices')
+            ans = []
+            for choice in p['choices'][0]:
+                if choice['correct'] == True:
+                    ans.append({'body': choice['body'], 'no': 0})
+        elif p['type'] == 'multi_blank' or p['type'] == 'single_blank' or p['type'] == 'hybrid':
+            print('\t\tMulti blank')
+            for s in p['blanks']:
+                ans.append({'body': s, 'no': 0})
+        else:
+            bug_report_ukp(p)
+        if pi == len(probs) - 1:
+            submit_practice_problem(hwid, [{
+                'problemId': p['id'],
+                'answer': ans,
+                'duration': randint(1, 12),
+            }], 'finished')
+        else:
+            submit_practice_problem(hwid, [{
+                'problemId': p['id'],
+                'answer': ans,
+                'duration': randint(1, 12),
+            }], 'unfinished')
 
 
-def complete_exam(problems):
+def complete_exam(grid, problems):
     for pi in range(len(problems)):
-    p = problems[pi]
-    ans = []
-    print('\t\t', p['type'])
-    if p['type'] in ['single_choice', 'exam', 'multi_choice']:
-        for choice in p['choices'][0]:
-            if choice['correct'] == True:
-                # Submit
-                ans.append({'body': choice['body'], 'no': 0})
-    elif p['type'] in ['multi_blank', 'single_blank', 'hybrid']:
-        for s in p['blanks']:
-            ans.append({'body': s, 'no': 0})
-    else:
-        bug_report_ukp(p)
-    commit_problem_progress(grid, pi == (len(problems) - 1), [{
-        'problemId': p['id'],
-        'answer': ans,
-        'type': p['type'],
-        'duration': randint(1, 120),
-    }])
-    print('\t\tSubmitted', p['id'])
+        p = problems[pi]
+        ans = []
+        print('\t\t', p['type'])
+        if p['type'] in ['single_choice', 'exam', 'multi_choice']:
+            for choice in p['choices'][0]:
+                if choice['correct'] == True:
+                    # Submit
+                    ans.append({'body': choice['body'], 'no': 0})
+        elif p['type'] in ['multi_blank', 'single_blank', 'hybrid']:
+            for s in p['blanks']:
+                ans.append({'body': s, 'no': 0})
+        else:
+            bug_report_ukp(p)
+        commit_problem_progress(grid, pi == (len(problems) - 1), [{
+            'problemId': p['id'],
+            'answer': ans,
+            'type': p['type'],
+            'duration': randint(1, 120),
+        }])
+        print('\t\tSubmitted', p['id'])
 
 
 def complete_homework(hw):
@@ -146,14 +146,14 @@ def complete_homework(hw):
             topics: list = hw['topics']
             print('\t检测到', len(topics), '个 Topic')
             for topic in topics:
-                complete_topic(topic)
+                complete_topic(hwid, topic)
                 print('\t已完成', topic['name'], topic['id'])
         elif hw['type'] == 1:
             print('[Practice] 正在完成', hw['name'], hw['id'])
             print('\t正在获取试题列表')
             probs = get_practice_problems(hwid)
             print('\t获取到', len(probs), '个试题')
-            complete_practice(probs)
+            complete_practice(hwid, probs)
         elif hw['type'] == 3:
             print('[Exam] 正在完成', hw['name'], hw['id'])
             print('\t正在获取试题列表')
@@ -161,7 +161,7 @@ def complete_homework(hw):
             problems = ctx['problems']
             grid = ctx['groupDetailId']
             print('\t获取到', len(problems), '个试题')
-            complete_exam(problems)
+            complete_exam(grid, problems)
     print('已完成', hw['name'], hwid)
 
 
@@ -174,8 +174,9 @@ def complete_vacation(vc):
             print('\t节点', tl['name'], '已解锁但未完成')
             tasks = tl['tasks']
             for t in tasks:
+                # print(t)
                 if t['type'] == 1:
-                    topic = get_vacation_video_detail(t['topicId'])
+                    topic = get_vacation_video_detail(t['topicId'], t['id'])
                     if t['videoState'] == 0:
                         submit_vacation_video(
                             topic['id'],
@@ -187,8 +188,8 @@ def complete_vacation(vc):
                     if t['problemState'] == 0:
                         ans = []
                         for pi in range(len(topic['practices'])):
-                            p = pi[0]
-                            print('\t\t', p[type])
+                            p = topic['practices'][pi][0]
+                            print('\t\t', p['type'])
                             if p['type'] in ['single_choice', 'exam', 'multi_choice']:
                                 for choice in p['choices'][0]:
                                     if choice['correct'] == True:
@@ -197,14 +198,16 @@ def complete_vacation(vc):
                                 ans = p['blanks']
                             else:
                                 bug_report_ukp(p)
+                            # print(p)
                             submit_vacation_practice(
-                                p['id'],
+                                p['problemId'],
                                 topic['id'],
                                 t['id'],
                                 p['pool'],
-                                pi == len(topic['practices'] - 1),
+                                pi == len(topic['practices']) - 1,
                                 ans
                             )
+
 
 def run():
     homework = get_unfinished_homework()
