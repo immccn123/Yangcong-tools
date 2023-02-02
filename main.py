@@ -77,7 +77,7 @@ def run():
                                                 ans.append(choice['body'])
                                         submit_problem(p['problemId'], hwid, tpid, ans)
                                         print('\n\nSubmitted.')
-                                    elif p['type'] == 'multi_blank':
+                                    elif p['type'] == 'multi_blank' or p['type'] == 'single_blank':
                                         print('\t\tMulti blank')
                                         submit_problem(p['problemId'], hwid, tpid, p['blanks'])
                                         print('\t\tSubmitted.')
@@ -109,7 +109,7 @@ def run():
                         for choice in p['choices'][0]:
                             if choice['correct'] == True:
                                 ans.append({'body': choice['body'], 'no': 0})
-                    elif p['type'] == 'multi_blank' or p['type'] == 'hybrid':
+                    elif p['type'] == 'multi_blank' or p['type'] == 'single_blank' or p['type'] == 'hybrid':
                         print('\t\tMulti blank')
                         for s in p['blanks']:
                             ans.append({'body': s, 'no': 0})
@@ -150,7 +150,7 @@ def run():
                         for choice in p['choices'][0]:
                             if choice['correct'] == True:
                                 ans.append({'body': choice['body'], 'no': 0})
-                    elif p['type'] == 'multi_blank' or p['type'] == 'hybrid':
+                    elif p['type'] == 'multi_blank' or p['type'] == 'single_blank' or p['type'] == 'hybrid':
                         print('\t\tMulti blank')
                         for s in p['blanks']:
                             ans.append({'body': s, 'no': 0})

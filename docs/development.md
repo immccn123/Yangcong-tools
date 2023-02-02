@@ -139,7 +139,7 @@ TODO: 将代码里的task改为exam。
 }
 ```
 
-### 填空题 `multi_blank`
+### 填空题 `multi_blank` | `single_blank`
 ```json
 {
     "blanks": ["第一个空"]
