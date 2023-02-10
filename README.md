@@ -4,6 +4,8 @@
 
 很明显，这个项目只对中国大陆部分学生有用，所以没有英文。
 
+近期计划用 Flutter 构建桌面/安卓/iOS客户端，但不代表 Python 脚本版本停止维护。
+
 Obviously, this project is only useful for some students in mainland China, so there is no English.
 
 若该项目侵犯了您的权利，请联系 immccn123（at）outlook.com 删除。
@@ -23,7 +25,7 @@ If the project violates your rights, please contact immccn123（at）outlook.com
 - [X] 精测作业 (Type 3)
 - [ ] 假期作业
   - [X] 视频作业 (Type 1)
-  - [ ] 测试作业（不打算完成，PR's Welcome）
+  - [ ] 测试作业（不打算完成，怕把别人账号搞出锅，PR's Welcome）
 
 ## 目前可以达到的效果
 - 视频作业/精测作业/课后习题 100% 准确率 + 100% 认真完成视频观看（并且超长）
@@ -48,4 +50,4 @@ az... 随便好了。注意码风。代码很难读，自己看着办（\
 <img src="https://static-cdn.immccn123.xyz/sponser-wec.png" width="210">
 </figure>
 
-联系我：[本站点](https://immccn123.xyz)页脚处
+联系我：[本站点](https://imken.moe/)页脚处
