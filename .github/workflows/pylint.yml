@@ -4,7 +4,10 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
       - uses: grantmcconnaughey/lintly-flake8-github-action@v1.0
+        if: github.event_name == 'pull_request'
         with:
-          token: ${% raw %}{{ secrets.GITHUB_TOKEN }}{% endraw %}
+          token: {{ secrets.GITHUB_TOKEN }}
+      - uses: ricardochaves/python-lint@v1.4.0
+        if: github.event_name == 'push'
