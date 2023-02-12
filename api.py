@@ -1,3 +1,10 @@
+'''
+    Copyright (C) 2023 Imken Luo <immccn123@outlook.com>
+    Licensed under GNU General Public License
+    version 3 or above <https://www.gnu.org/licenses/>.
+    This program is a part of Yangcong-tools. See `main.py` for more details.
+'''
+
 from random import randint
 import requests, json
 AUTH_TOKEN = ''

@@ -1,8 +1,8 @@
-# import requests
+import time
+
 from api import *
 
 INTRO_S = R'''
-----------------------------------------------------------------------------------------
  __  __   ______   ___   ___             _________  ______   ______   __
 /_/\/_/\ /_____/\ /__/\ /__/\           /________/\/_____/\ /_____/\ /_/\
 \ \ \ \ \\:::__\/ \::\ \\  \ \   _______\__.::.__\/\:::_ \ \\:::_ \ \\:\ \
@@ -10,23 +10,38 @@ INTRO_S = R'''
   \::::_\/ \:\ \/_/\\:: ___::\ \\__::::\/   \::\ \   \:\ \ \ \\:\ \ \ \\:\ \____
     \::\ \  \:\_\ \ \\: \ \\::\ \            \::\ \   \:\_\ \ \\:\_\ \ \\:\/___/\
      \__\/   \_____\/ \__\/ \::\/             \__\/    \_____\/ \_____\/ \_____\/  s
-      Licensed under GPLv3.
-      If the project violates your rights,
-      please contact immccn123 (at) outlook.com for removal.
-      https://github.com/immccn123/Yangcong-tools
-----------------------------------------------------------------------------------------
+
+    Yangcong-tools / YCH-Tools: A tool to Complete home work on Onion School.
+    Copyright (C) 2023 Imken Luo
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+    This program is a part of Yangcong-tools.
 '''
 
 print(INTRO_S)
 
-def bug_report_ukp(msg):
+def bug_report(msg, **kwargs):
     print('\n\n\n')
-    print('Error with code 10001')
-    print('检测到不支持的题目类型；请将下列内容拷贝发送至 immccn123（at）outlook.com，\n或者前往我们的GitHub仓库提出issue: https://github.com/immccn123/Yangcong-tools/issues/new/choose')
-    print('务必将下列内容拷贝并粘贴在issue里。')
-    print('---------- BEGIN ----------')
-    print(msg)
-    print('----------- END -----------')
+    print('Oops! 程序出现了一些问题：\n\t%s' % msg)
+    print('正在准备生成日志文件和调试信息，请稍后。')
+    filename = 'YCT-Error-%d.json.log' % time.time_ns()
+    logfile = open(filename, 'w', encoding='utf-8')
+    logfile.write(json.dumps(kwargs))
+    logfile.close()
+    print('日志文件已生成，位于当前工作目录下的 %s' % filename)
+    print('请前往我们的GitHub仓库提出issue: https://github.com/immccn123/Yangcong-tools/issues/new/choose，\n或发送日志文件至 immccn123（at）outlook.com。')
     exit(3)
 
 def complete_topic(hwid, topic):
@@ -48,32 +63,30 @@ def complete_topic(hwid, topic):
                 print('\t\t检测到', len(topic_detail['practices']), '个习题')
                 for pc in topic_detail['practices']:
                     p = pc[0]
-                    # 判断类型
-                    if p['type'] == 'single_choice':
-                        print('\t\tSingle choice')
-                        for choice in p['choices'][0]:
-                            if choice['correct'] == 'true' or choice['correct'] == True:
-                                # Submit
-                                submit_problem(p['problemId'], hwid, tpid, [choice['body']])
-                                print('\t\tSubmitted.')
-                                break
-                    elif p['type'] == 'multi_choice':
+                    if p['type'] in ['multi_choice', 'single_choice']:
                         print('\t\tMulti Choices')
                         ans = []
                         for choice in p['choices'][0]:
                             if choice['correct'] == True:
                                 ans.append(choice['body'])
                         submit_problem(p['problemId'], hwid, tpid, ans)
-                        print('\n\nSubmitted.')
-                    elif p['type'] == 'multi_blank' or p['type'] == 'single_blank':
+                        print('\t\tSubmitted.')
+                    elif p['type'] in ['multi_blank', 'single_blank', 'hybrid']:
                         print('\t\tMulti blank')
                         submit_problem(p['problemId'], hwid, tpid, p['blanks'])
                         print('\t\tSubmitted.')
-                    elif p['type'] == 'hybrid':
-                        print('\t\tHybrid Problem')
-                        submit_problem(p['problemId'], hwid, tpid, p['blanks'])
+                    elif p['type'] in ['exam']:
+                        print('\t\tExam')
+                        submit_problem(p['problemId'], hwid, tpid, ["我答对了", "答:"])
+                        print('\t\tSubmitted.')
                     else:
-                        bug_report_ukp(p)
+                        bug_report(
+                            '未知问题类型 10001',
+                            break_point='complete_topic',
+                            problem=p,
+                            topic_name=topic['name'],
+                            ptype=p['type']
+                        )
             else:
                 print('\t\t无习题。')
 
@@ -82,7 +95,7 @@ def complete_practice(hwid, probs):
     for pi in range(len(probs)):
         p = probs[pi]
         ans = []
-        if p['type'] == 'single_choice' or p['type'] == 'exam':
+        if p['type'] in ['single_choice', 'exam', 'multi_choice']:
             print('\t\tSingle choice')
             for choice in p['choices'][0]:
                 if choice['correct'] == True:
@@ -99,7 +112,12 @@ def complete_practice(hwid, probs):
             for s in p['blanks']:
                 ans.append({'body': s, 'no': 0})
         else:
-            bug_report_ukp(p)
+            bug_report(
+                '未知问题类型 10001',
+                break_point='complete_practice',
+                problem=p,
+                ptype=p['type']
+            )
         if pi == len(probs) - 1:
             submit_practice_problem(hwid, [{
                 'problemId': p['id'],
@@ -128,7 +146,12 @@ def complete_exam(grid, problems):
             for s in p['blanks']:
                 ans.append({'body': s, 'no': 0})
         else:
-            bug_report_ukp(p)
+            bug_report(
+                '未知问题类型 10001',
+                break_point='complete_exam',
+                problem=p,
+                ptype=p['type']
+            )
         commit_problem_progress(grid, pi == (len(problems) - 1), [{
             'problemId': p['id'],
             'answer': ans,
@@ -197,7 +220,13 @@ def complete_vacation(vc):
                             elif p['type'] in ['multi_blank', 'single_blank', 'hybrid']:
                                 ans = p['blanks']
                             else:
-                                bug_report_ukp(p)
+                                bug_report(
+                                    '未知问题类型 10001',
+                                    timeline_name=tl['name'],
+                                    break_point='complete_vacation',
+                                    problem=p,
+                                    ptype=p['type']
+                                )
                             submit_vacation_practice(
                                 p['problemId'],
                                 topic['id'],

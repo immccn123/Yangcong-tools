@@ -14,7 +14,7 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: 出错时的输出
+      label: 日志文件的内容
       # description: 
       placeholder: |
         {
@@ -23,6 +23,5 @@ body:
           "continuity": false,
           "goalId": "0e0114f9-9a9f-46e3-942e-2442f48e8cf4",
           ...
-      render: jsonc
     validations:
       required: true
