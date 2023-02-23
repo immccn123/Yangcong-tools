@@ -1,0 +1,38 @@
+name: Build
+on: push
+
+jobs:
+  Windows-Build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+          architecture: 'x64'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+      - name: Build Executable File
+        run: |
+          cd src
+          pyinstaller --collect-all yangcong_tools -F yct.py
+      - name: Upload pytest test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: yct.exe
+          path: dist/yct.exe
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: github.event_name == "push" && contains(fromJSON(github.event.commits.modified), "VERSION")
+        with:
+          files: |
+            dist/yct.exe
+
+
+

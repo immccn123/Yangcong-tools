@@ -1,36 +1,6 @@
 import time
 
-from api import *
-
-INTRO_S = R'''
- __  __   ______   ___   ___             _________  ______   ______   __
-/_/\/_/\ /_____/\ /__/\ /__/\           /________/\/_____/\ /_____/\ /_/\
-\ \ \ \ \\:::__\/ \::\ \\  \ \   _______\__.::.__\/\:::_ \ \\:::_ \ \\:\ \
- \:\_\ \ \\:\ \  __\::\/_\ .\ \ /______/\  \::\ \   \:\ \ \ \\:\ \ \ \\:\ \
-  \::::_\/ \:\ \/_/\\:: ___::\ \\__::::\/   \::\ \   \:\ \ \ \\:\ \ \ \\:\ \____
-    \::\ \  \:\_\ \ \\: \ \\::\ \            \::\ \   \:\_\ \ \\:\_\ \ \\:\/___/\
-     \__\/   \_____\/ \__\/ \::\/             \__\/    \_____\/ \_____\/ \_____\/  s
-
-    Yangcong-tools / YCH-Tools: A tool to Complete home work on Onion School.
-    Copyright (C) 2023 Imken Luo
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-    This program is a part of Yangcong-tools.
-'''
-
-print(INTRO_S)
+from yangcong_tools.api import *
 
 def bug_report(msg, **kwargs):
     print('\n\n\n')
@@ -236,40 +206,3 @@ def complete_vacation(vc):
                                 ans
                             )
 
-
-def run():
-    homework = get_unfinished_homework()
-    exp_hm = get_expired_homework()
-    homework: list = homework['homeworkList'] + exp_hm['homeworkList']
-    print('已获取到', homework.__len__(), '个作业')
-    for hw in homework:
-        complete_homework(hw)
-    vacations = get_vacations()
-    print('检测到', len(vacations), '个假期课程')
-    for vc in vacations:
-        complete_vacation(vc)
-
-
-
-if __name__ == '__main__':
-    userinfo = []
-    try:
-        with open('users.json', 'r', encoding='utf-8') as f:
-            userinfo = json.load(f)
-        for user in userinfo:
-            if login(user['username'], user['password']) is not None:
-                print('[Multi User] 正在处理用户', user['username'])
-                run()
-            else:
-                print('Error:', user['username'], '的账号或密码错误！')
-                if input('是否继续？[y/N]') not in ['Y', 'y']:
-                    print('Aborted.')
-                    exit(3)
-    except FileNotFoundError:
-        un = input('用户名/手机号：')
-        pw = input('密码：')
-        login(un, pw)
-        run()
-    except (json.decoder.JSONDecodeError) as E:
-        print(E)
-        print('多用户配置文件格式有误。')
