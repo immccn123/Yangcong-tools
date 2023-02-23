@@ -1,7 +1,7 @@
 # 使用方法
 
 ## 从二进制文件运行（Windows）
-从[这里](https://github.com/mashirozx/sakura/releases/latest)下载最新可执行文件（ych.exe）。
+从[这里](https://github.com/immccn123/Yangcong-tools/releases/latest)下载最新可执行文件（ych.exe）。
 
 打开 cmd，把 yct.exe 拖入窗口中，此时命令类似于下列格式：
 ```batch
