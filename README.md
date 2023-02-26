@@ -45,9 +45,7 @@ az... 随便好了。注意码风。代码很难读，自己看着办（\
 ## ❤捐赠！
 如果这个项目对你有帮助的话，考虑一下啦qwq
 
-<figure class="half">
-<img src="https://static-cdn.immccn123.xyz/sponser-ali.jpg" width="210">
-<img src="https://static-cdn.immccn123.xyz/sponser-wec.png" width="210">
-</figure>
+[Sponsor Imken!](https://sponsor.imken.moe/)\
+[爱发电](https://afdian.net/a/immccn123)
 
 联系我：[本站点](https://imken.moe/)页脚处
