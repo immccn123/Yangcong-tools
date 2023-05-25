@@ -16,8 +16,6 @@ If the project violates your rights, please contact immccn123（at）outlook.com
 
 [使用方法](docs/usage.md) [开发文档](docs/development.md)
 
-[致谢](https://github.com/immccn123/Yangcong-tools/wiki/%E8%87%B4%E8%B0%A2-Acknowledgement)
-
 ## Todos
 - [X] 视频作业 (Type 0)
 - [X] 课后习题/练习任务 (Type 1)
@@ -42,12 +40,8 @@ az... 随便好了。注意码风。代码很难读，自己看着办（\
 
 （当然如果有谁来改一下我这个答辩码风那就更好了）
 
-## ❤捐赠！
-如果这个项目对你有帮助的话，考虑一下啦qwq
+## 捐赠（怎么这么不要脸）
 
-<figure class="half">
-<img src="https://static-cdn.immccn123.xyz/sponser-ali.jpg" width="210">
-<img src="https://static-cdn.immccn123.xyz/sponser-wec.png" width="210">
-</figure>
+https://sponsor.imken.moe/
 
 联系我：[本站点](https://imken.moe/)页脚处
