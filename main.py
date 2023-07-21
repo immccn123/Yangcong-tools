@@ -1,4 +1,5 @@
 import time
+import os
 
 from api import *
 
@@ -29,6 +30,8 @@ INTRO_S = R'''
 
     This program is a part of Yangcong-tools.
 '''
+
+CAPTURE_IMG = False
 
 print(INTRO_S)
 
@@ -188,6 +191,14 @@ def complete_homework(hw):
     print('已完成', hw['name'], hwid)
 
 
+def download_img(url, name):
+    print('Downloading:' + url + ", storage: " + name)
+    res = requests.get(url)
+    with open('capture/' + name, 'wb') as f:
+        f.write(res.content)
+        f.close
+
+
 def complete_vacation(vc):
     print('正在完成', vc['name'])
     timelines = get_vacation_timelines(vc['id'])
@@ -200,6 +211,8 @@ def complete_vacation(vc):
                 # print(t)
                 if t['type'] == 1:
                     topic = get_vacation_video_detail(t['topicId'], t['id'])
+                    if  CAPTURE_IMG == True:
+                        download_img(topic['video']['thumbnail'] + '.png', topic['video']['name'] + '.png')
                     if t['videoState'] == 0:
                         submit_vacation_video(
                             topic['id'],
@@ -252,6 +265,12 @@ def run():
 
 
 if __name__ == '__main__':
+    a = input('是否截取每个视频的总结(y/n): ')
+    if a == 'y' or a == 'Y':
+        CAPTURE_IMG = True
+        if os.path.exists('capture') == False:
+            os.mkdir('capture')
+
     userinfo = []
     try:
         with open('users.json', 'r', encoding='utf-8') as f:

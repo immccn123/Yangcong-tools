@@ -132,3 +132,6 @@ dmypy.json
 username
 password
 users.json
+
+# Capture Directory
+capture/
