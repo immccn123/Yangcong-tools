@@ -132,3 +132,7 @@ dmypy.json
 username
 password
 users.json
+
+# Manual ignore
+
+*.ignored
