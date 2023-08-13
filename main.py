@@ -3,15 +3,7 @@ import time
 from api import *
 
 INTRO_S = R"""
- __  __   ______   ___   ___             _________  ______   ______   __
-/_/\/_/\ /_____/\ /__/\ /__/\           /________/\/_____/\ /_____/\ /_/\
-\ \ \ \ \\:::__\/ \::\ \\  \ \   _______\__.::.__\/\:::_ \ \\:::_ \ \\:\ \
- \:\_\ \ \\:\ \  __\::\/_\ .\ \ /______/\  \::\ \   \:\ \ \ \\:\ \ \ \\:\ \
-  \::::_\/ \:\ \/_/\\:: ___::\ \\__::::\/   \::\ \   \:\ \ \ \\:\ \ \ \\:\ \____
-    \::\ \  \:\_\ \ \\: \ \\::\ \            \::\ \   \:\_\ \ \\:\_\ \ \\:\/___/\
-     \__\/   \_____\/ \__\/ \::\/             \__\/    \_____\/ \_____\/ \_____\/  s
-
-    Yangcong-tools / YCH-Tools: A tool to Complete home work on Onion School.
+    Yangcong-tools: A tool to Complete home work on Onion School.
     Copyright (C) 2023 Imken Luo
 
     This program is free software: you can redistribute it and/or modify
@@ -48,198 +40,189 @@ def bug_report(msg, **kwargs):
     exit(3)
 
 
-def complete_topic(hwid, topic):
-    tpid = topic["id"]
-    print("\t正在完成", topic["name"], topic["id"])
-    print("\t话题完成情况: ", topic["state"])
-    if topic["state"] == "unfinished":
-        # 检测视频完成情况
-        print("\t视频完成情况: ", topic["videoState"])
-        topic_detail = get_topic_detail(tpid)
-        if topic["videoState"] == "unfinished":
-            print("\t\t正在完成视频")
-            submit_video(
-                tpid,
-                hwid,
-                topic_detail["video"]["id"],
-                int(topic_detail["video"]["duration"]),
+def complete_topic(homework_id, topic):
+    if topic["state"] != "unfinished":
+        return
+
+    topic_id = topic["id"]
+    print("\t获取话题", topic["name"], "的详细信息...", end="")
+    topic_detail = get_topic_detail(topic_id)
+    print(" 完成")
+    if topic["videoState"] == "unfinished":
+        print("\t\t正在完成视频...", end="")
+        submit_video(
+            topic_id,
+            homework_id,
+            topic_detail["video"]["id"],
+            int(topic_detail["video"]["duration"]),
+        )
+        print(" 完成")
+    if topic["practiceState"] != "unfinished":
+        return
+    if topic_detail["practices"] == None:
+        print("\t无习题")
+        return
+    problem_count = len(topic_detail["practices"])
+    done_count = 0
+    for pc in topic_detail["practices"]:
+        problem = pc[0]
+        problem_id = problem["problemId"]
+        problem_type = problem["type"]
+        if problem_type in ["multi_choice", "single_choice"]:
+            ans = []
+            for choice in problem["choices"][0]:
+                if choice["correct"] == True:
+                    ans.append(choice["body"])
+            submit_video_problem(problem_id, homework_id, topic_id, ans)
+        elif problem_type in ["multi_blank", "single_blank", "hybrid"]:
+            submit_video_problem(problem_id, homework_id, topic_id, problem["blanks"])
+        elif problem_type in ["exam"]:
+            submit_video_problem(problem_id, homework_id, topic_id, ["我答对了", "答:"])
+        else:
+            bug_report(
+                "未知问题类型 10001",
+                break_point="complete_topic",
+                problem=problem,
+                topic_name=topic["name"],
+                ptype=problem_type,
             )
-            print("\t\tDone.")
-        print("\t练习完成情况: ", topic["practiceState"])
-        if topic["practiceState"] == "unfinished":
-            print("\t\t正在完成练习")
-            if topic_detail["practices"] != None:
-                print("\t\t检测到", len(topic_detail["practices"]), "个习题")
-                for pc in topic_detail["practices"]:
-                    p = pc[0]
-                    if p["type"] in ["multi_choice", "single_choice"]:
-                        print("\t\tMulti Choices")
-                        ans = []
-                        for choice in p["choices"][0]:
-                            if choice["correct"] == True:
-                                ans.append(choice["body"])
-                        submit_video_problem(p["problemId"], hwid, tpid, ans)
-                        print("\t\tSubmitted.")
-                    elif p["type"] in ["multi_blank", "single_blank", "hybrid"]:
-                        print("\t\tMulti blank")
-                        submit_video_problem(p["problemId"], hwid, tpid, p["blanks"])
-                        print("\t\tSubmitted.")
-                    elif p["type"] in ["exam"]:
-                        print("\t\tExam")
-                        submit_video_problem(p["problemId"], hwid, tpid, ["我答对了", "答:"])
-                    else:
-                        bug_report(
-                            "未知问题类型 10001",
-                            break_point="complete_topic",
-                            problem=p,
-                            topic_name=topic["name"],
-                            ptype=p["type"],
-                        )
-            else:
-                print("\t\t无习题。")
+        done_count += 1
+        print(f"\t完成习题 ({done_count}/{problem_count})")
 
 
-def complete_practice(hwid, probs):
-    for pi in range(len(probs)):
-        p = probs[pi]
+def complete_practice(homework_id, problem_list):
+    for index, problem in enumerate(problem_list):
         ans = []
-        if p["type"] in ["single_choice", "exam", "multi_choice"]:
-            print("\t\tSingle choice")
-            for choice in p["choices"][0]:
+        problem_type = problem["type"]
+        if problem_type in ["single_choice", "exam", "multi_choice"]:
+            for choice in problem["choices"][0]:
                 if choice["correct"] == True:
                     ans.append({"body": choice["body"], "no": 0})
-        elif p["type"] in ["multi_blank", "single_blank", "hybrid"]:
-            print("\t\tMulti blank")
-            for s in p["blanks"]:
+        elif problem_type in ["multi_blank", "single_blank", "hybrid"]:
+            for s in problem["blanks"]:
                 ans.append({"body": s, "no": 0})
         else:
             bug_report(
                 "未知问题类型 10001",
                 break_point="complete_practice",
-                problem=p,
-                ptype=p["type"],
+                problem=problem,
+                ptype=problem_type,
             )
-        if pi == len(probs) - 1:
-            submit_practice_problem(
-                hwid,
-                [
-                    {
-                        "problemId": p["id"],
-                        "answer": ans,
-                        "duration": randint(1, 12),
-                    }
-                ],
-                "finished",
-            )
-        else:
-            submit_practice_problem(
-                hwid,
-                [
-                    {
-                        "problemId": p["id"],
-                        "answer": ans,
-                        "duration": randint(1, 12),
-                    }
-                ],
-                "unfinished",
-            )
+        submit_practice_problem(
+            homework_id,
+            [
+                {
+                    "problemId": problem["id"],
+                    "answer": ans,
+                    "duration": randint(1, 12),
+                }
+            ],
+            "finished" if index == len(problem_list) - 1 else "unfinished",
+        )
 
 
-def complete_exam(grid, problems):
-    for pi in range(len(problems)):
-        p = problems[pi]
+def complete_exam(group_id, problem_list):
+    problem_count = len(problem_list)
+    for index, problem in enumerate(problem_list):
         ans = []
-        print("\t\t", p["type"])
-        if p["type"] in ["single_choice", "exam", "multi_choice"]:
-            for choice in p["choices"][0]:
+        problem_type = problem["type"]
+        if problem_type in ["single_choice", "exam", "multi_choice"]:
+            for choice in problem["choices"][0]:
                 if choice["correct"] == True:
                     ans.append({"body": choice["body"], "no": 0})
-        elif p["type"] in ["multi_blank", "single_blank", "hybrid"]:
-            for s in p["blanks"]:
+        elif problem_type in ["multi_blank", "single_blank", "hybrid"]:
+            for s in problem["blanks"]:
                 ans.append({"body": s, "no": 0})
         else:
             bug_report(
-                "未知问题类型 10001", break_point="complete_exam", problem=p, ptype=p["type"]
+                "未知问题类型 10001",
+                break_point="complete_exam",
+                problem=problem,
+                ptype=problem_type,
             )
         commit_problem_progress(
-            grid,
-            pi == (len(problems) - 1),
+            group_id,
+            index == len(problem_list) - 1,
             [
                 {
-                    "problemId": p["id"],
+                    "problemId": problem["id"],
                     "answer": ans,
-                    "type": p["type"],
+                    "type": problem_type,
                     "duration": randint(1, 120),
                 }
             ],
         )
-        print("\t\tSubmitted", p["id"])
+        print(f"\t\t已完成 ({index + 1}/{problem_count})")
 
 
 def complete_homework(hw):
-    hwid = hw["id"]
-    if hw["state"] != 2:
-        if hw["type"] == 0:
-            print("[Video] 正在完成", hw["name"], hw["id"])
-            topics: list = hw["topics"]
-            print("\t检测到", len(topics), "个 Topic")
-            for topic in topics:
-                complete_topic(hwid, topic)
-                print("\t已完成", topic["name"], topic["id"])
-        elif hw["type"] == 1:
-            print("[Practice] 正在完成", hw["name"], hw["id"])
-            print("\t正在获取试题列表")
-            probs = get_practice_problems(hwid)
-            print("\t获取到", len(probs), "个试题")
-            complete_practice(hwid, probs)
-        elif hw["type"] == 3:
-            print("[Exam] 正在完成", hw["name"], hw["id"])
-            print("\t正在获取试题列表")
-            ctx = get_task_problem(hwid)
-            problems = ctx["problems"]
-            grid = ctx["groupDetailId"]
-            print("\t获取到", len(problems), "个试题")
-            complete_exam(grid, problems)
-    print("已完成", hw["name"], hwid)
+    homework_id = hw["id"]
+    if hw["state"] == 2:
+        return
+    if hw["type"] == 0:
+        print("[Video] 正在完成", hw["name"], homework_id)
+        topics: list = hw["topics"]
+        print("\t共", len(topics), "个话题")
+        for topic in topics:
+            complete_topic(homework_id, topic)
+            print("\t已完成", topic["name"], topic["id"])
+    elif hw["type"] == 1:
+        print("[Practice] 正在完成", hw["name"], homework_id)
+        print("\t正在获取试题列表...", end="")
+        problems = get_practice_problems(homework_id)
+        print(" 共", len(problems), "题")
+        complete_practice(homework_id, problems)
+    elif hw["type"] == 3:
+        print("[Exam] 正在完成", hw["name"], homework_id)
+        print("\t正在获取试题列表...", end="")
+        ctx = get_task_problem(homework_id)
+        problems = ctx["problems"]
+        group_id = ctx["groupDetailId"]
+        print(" 共", len(problems), "题")
+        complete_exam(group_id, problems)
+    print("已完成", hw["name"], homework_id)
 
 
 def complete_vacation_task_video(t, tl):
     topic = get_vacation_video_detail(t["topicId"], t["id"])
     if t["videoState"] == 0:
+        print("\t正在完成视频...", end="")
         submit_vacation_video(
             topic["id"],
             topic["video"]["id"],
             t["id"],
             int(topic["video"]["duration"]) + 1,
         )
-        print("\t\t已完成视频")
-    if t["problemState"] == 0:
-        ans = []
-        for pi in range(len(topic["practices"])):
-            p = topic["practices"][pi][0]
-            print("\t\t", p["type"])
-            if p["type"] in ["single_choice", "exam", "multi_choice"]:
-                for choice in p["choices"][0]:
-                    if choice["correct"] == True:
-                        ans.append(choice["body"])
-            elif p["type"] in ["multi_blank", "single_blank", "hybrid"]:
-                ans = p["blanks"]
-            else:
-                bug_report(
-                    "未知问题类型 10001",
-                    timeline_name=tl["name"],
-                    break_point="complete_vacation",
-                    problem=p,
-                    ptype=p["type"],
-                )
-            submit_vacation_practice(
-                p["problemId"],
-                topic["id"],
-                t["id"],
-                p["pool"],
-                pi == len(topic["practices"]) - 1,
-                ans,
+        print(" 完成")
+    if t["problemState"] != 0:
+        return
+    ans = []
+    practices_count = len(topic["practices"])
+    for index, problem in enumerate(topic["practices"]):
+        problem = problem[0]
+        if problem["type"] in ["single_choice", "exam", "multi_choice"]:
+            for choice in problem["choices"][0]:
+                if choice["correct"] == True:
+                    ans.append(choice["body"])
+        elif problem["type"] in ["multi_blank", "single_blank", "hybrid"]:
+            ans = problem["blanks"]
+        else:
+            bug_report(
+                "未知问题类型 10001",
+                timeline_name=tl["name"],
+                break_point="complete_vacation",
+                problem=problem,
+                ptype=problem["type"],
             )
+        submit_vacation_practice(
+            problem["problemId"],
+            topic["id"],
+            t["id"],
+            problem["pool"],
+            index == len(topic["practices"]) - 1,
+            ans,
+        )
+        print(f"\t完成练习 ({index + 1}/{practices_count})")
 
 
 def complete_vacation_task_stage(t, vc, subject_id, stage_id):
@@ -250,23 +233,22 @@ def complete_vacation_task_stage(t, vc, subject_id, stage_id):
         vc["id"],
     )
     problem_details = []
-    for pi in range(len(problems)):
-        p = problems[pi]
+    for index, problem in enumerate(problems):
+        problem_type = problem["type"]
         ans = []
-        print("\t\t", p["type"])
-        if p["type"] in ["single_choice", "exam", "multi_choice"]:
-            for choice in p["choices"][0]:
+        if problem_type in ["single_choice", "exam", "multi_choice"]:
+            for choice in problem["choices"][0]:
                 if choice["correct"] == True:
                     ans.append(choice["body"])
-        elif p["type"] in ["multi_blank", "single_blank", "hybrid"]:
-            for s in p["blanks"]:
+        elif problem_type in ["multi_blank", "single_blank", "hybrid"]:
+            for s in problem["blanks"]:
                 ans.append(s)
         else:
             bug_report(
                 "未知问题类型 10001",
                 break_point="vacation",
-                problem=p,
-                ptype=p["type"],
+                problem=problem,
+                ptype=problem_type,
             )
         problem_details.append(
             submit_vacation_stage_problem(
@@ -274,13 +256,13 @@ def complete_vacation_task_stage(t, vc, subject_id, stage_id):
                 stage_id=stage_id,
                 subject_id=subject_id,
                 homework_id=vc["id"],
-                problem_id=p["id"],
-                problem_type=p["type"],
+                problem_id=problem["id"],
+                problem_type=problem_type,
                 answer=ans,
-                is_complete=(pi == len(problems) - 1),
+                is_complete=(index == len(problems) - 1),
             )
         )
-        if pi == len(problems) - 1:
+        if index == len(problems) - 1:
             finalsubmit_vacation_stage_problem(t["id"], problem_details)
 
 
@@ -290,31 +272,36 @@ def complete_vacation(vc):
     timelines = vacation["timeLines"]
     stage_id = vacation["stageId"]
     subject_id = vacation["subjectId"]
-    print("\t已获取到", len(timelines), "个时间节点")
+    print("\t共", len(timelines), "个时间节点")
     for tl in timelines:
-        if tl["state"] == 0 and tl["unlock"]:
-            print("\t节点", tl["name"], "已解锁但未完成")
-            tasks = tl["tasks"]
-            for t in tasks:
-                if t["type"] == 1:
-                    complete_vacation_task_video(t, tl)
-                elif t["type"] == 2:
-                    complete_vacation_task_stage(
-                        t, vc, subject_id=subject_id, stage_id=stage_id
-                    )
+        if not (tl["state"] == 0 and tl["unlock"]):
+            continue
+        if len(tl["tasks"]) == 0:
+            continue
+        print("\t节点", tl["name"], "已解锁但未完成")
+        tasks = tl["tasks"]
+        for t in tasks:
+            if t["type"] == 1:
+                complete_vacation_task_video(t, tl)
+            elif t["type"] == 2:
+                complete_vacation_task_stage(
+                    t, vc, subject_id=subject_id, stage_id=stage_id
+                )
 
 
 def run():
-    homework = get_unfinished_homework()
-    exp_hm = get_expired_homework()
-    homework: list = homework["homeworkList"] + exp_hm["homeworkList"]
-    print("已获取到", homework.__len__(), "个作业")
-    for hw in homework:
-        complete_homework(hw)
+    unfinished_homework = get_unfinished_homework()
+    expired_homework = get_expired_homework()
+    homework: list = (
+        unfinished_homework["homeworkList"] + expired_homework["homeworkList"]
+    )
     vacations = get_vacations()
-    print("检测到", len(vacations), "个假期课程")
-    for vc in vacations:
-        complete_vacation(vc)
+    print("共", len(homework), "个作业")
+    for homework in homework:
+        complete_homework(homework)
+    print("共", len(vacations), "个假期课程")
+    for vacation in vacations:
+        complete_vacation(vacation)
 
 
 if __name__ == "__main__":

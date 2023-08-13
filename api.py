@@ -1,12 +1,14 @@
 """
-    Copyright (C) 2023 Imken Luo <immccn123@outlook.com>
+    Copyright (C) 2023 Imken Luo <me@imken.moe>
     Licensed under GNU General Public License
     version 3 or above <https://www.gnu.org/licenses/>.
     This program is a part of Yangcong-tools. See `main.py` for more details.
 """
 
+import json
 from random import randint
-import requests, json
+
+import requests
 
 AUTH_TOKEN = ""
 
@@ -32,10 +34,12 @@ headers = {
     "Referrer-Policy": "strict-origin-when-cross-origin",
 }
 
+session = requests.session()
+
 
 def login(username, password):
     global AUTH_TOKEN
-    ctx = requests.post(
+    ctx = session.post(
         url="https://school-api.yangcong345.com/public/login",
         headers=headers,
         json={
@@ -43,21 +47,20 @@ def login(username, password):
             "password": password,
         },
     )
-    # print(password, 'endl')
     if ctx.status_code != 200:
         return None
-    else:
-        AUTH_TOKEN = ctx.headers.get("authorization")
-        headers["authorization"] = AUTH_TOKEN
-        return AUTH_TOKEN
+    AUTH_TOKEN = ctx.headers.get("authorization")
+    headers["authorization"] = AUTH_TOKEN
+    session.headers = headers
+    return AUTH_TOKEN
 
 
 def get_unfinished_homework():
     if AUTH_TOKEN == "":
         return
-    ctx = requests.get(
+    ctx = session.get(
         url="https://school-api.yangcong345.com/student/ai-homework/all/unfinish",
-        headers=headers,
+        # headers=headers,
     )
     return json.loads(ctx.content.decode("utf-8"))
 
@@ -65,9 +68,9 @@ def get_unfinished_homework():
 def get_expired_homework():
     if AUTH_TOKEN == "":
         return
-    ctx = requests.get(
+    ctx = session.get(
         url="https://school-api.yangcong345.com/student/ai-homework/all/expired",
-        headers=headers,
+        # headers=headers,
     )
     return json.loads(ctx.content.decode("utf-8"))
 
@@ -75,9 +78,9 @@ def get_expired_homework():
 def get_topic_detail(topic_id):
     if AUTH_TOKEN == "":
         return
-    ctx = requests.get(
+    ctx = session.get(
         url=f"https://school-api.yangcong345.com/course/topics/{topic_id}/detail-universal",
-        headers=headers,
+        # headers=headers,
     )
     return json.loads(ctx.content.decode("utf-8"))
 
@@ -85,9 +88,9 @@ def get_topic_detail(topic_id):
 def submit_video(topic_id, homework_id, video_id, duration):
     if AUTH_TOKEN == "":
         return
-    requests.put(
+    session.put(
         url="https://school-api.yangcong345.com/student/previews/video",
-        headers=headers,
+        # headers=headers,
         json={
             "topicId": topic_id,
             "videoId": video_id,
@@ -99,9 +102,9 @@ def submit_video(topic_id, homework_id, video_id, duration):
             "videoRecords": [1] * duration,
         },
     )
-    requests.post(
+    session.post(
         url="https://api-v5-0.yangcong345.com/learn/video",
-        headers=headers,
+        # headers=headers,
         json={
             "duration": duration + 3,
             "timepoint": duration,
@@ -117,9 +120,9 @@ def submit_video(topic_id, homework_id, video_id, duration):
 def submit_video_problem(problem_id, homework_id, topic_id, answers):
     if AUTH_TOKEN == "":
         return
-    return requests.post(
+    return session.post(
         url="https://api-v5-0.yangcong345.com/learn/practice",
-        headers=headers,
+        # headers=headers,
         json={
             "problemId": problem_id,
             "topicId": topic_id,
@@ -137,22 +140,22 @@ def get_task_problem(homework_id):
     if AUTH_TOKEN == "":
         return
     uid = json.loads(
-        requests.get(
+        session.get(
             url="https://school-api.yangcong345.com/user-auths/order/auth",
-            headers=headers,
+            # headers=headers,
         ).content.decode("utf-8")
     )["userId"]
     detail_id = json.loads(
-        requests.post(
+        session.post(
             url=f"https://school-api.yangcong345.com/student/tasks/{homework_id}/task-detail",
-            headers=headers,
+            # headers=headers,
             json={"userId": uid},
         ).content.decode("utf-8")
     )["taskDetailId"]
     return json.loads(
-        requests.get(
+        session.get(
             url=f"https://school-api.yangcong345.com/student/task-detail/{detail_id}/problems",
-            headers=headers,
+            # headers=headers,
         ).content.decode("utf-8")
     )
 
@@ -160,9 +163,9 @@ def get_task_problem(homework_id):
 def commit_problem_progress(group_id, is_finished: bool, problems):
     if AUTH_TOKEN == "":
         return
-    return requests.put(
+    return session.put(
         url=f"https://school-api.yangcong345.com/student/group-detail/{group_id}/problems-progress",
-        headers=headers,
+        # headers=headers,
         json={"isFinished": is_finished, "problems": problems},
     )
 
@@ -171,9 +174,9 @@ def get_practice_problems(homework_id):
     if AUTH_TOKEN == "":
         return
     return json.loads(
-        requests.get(
+        session.get(
             url=f"https://school-api.yangcong345.com/student/practices/{homework_id}",
-            headers=headers,
+            # headers=headers,
         ).content.decode("utf-8")
     )["problems"]
 
@@ -186,9 +189,9 @@ def get_practice_problems(homework_id):
 def submit_practice_problem(homework_id, problems, state):
     if AUTH_TOKEN == "":
         return
-    requests.put(
+    session.put(
         url="https://school-api.yangcong345.com/student/practices",
-        headers=headers,
+        # headers=headers,
         json={
             "homeworkId": homework_id,
             "problems": problems,
@@ -200,9 +203,9 @@ def submit_practice_problem(homework_id, problems, state):
 def get_vacations():
     if AUTH_TOKEN == "":
         return
-    ctx = requests.get(
+    ctx = session.get(
         url="https://school-api.yangcong345.com/vacation/student/homework/list",
-        headers=headers,
+        # headers=headers,
     )
     ctx = ctx.content.decode("utf-8")
     return json.loads(ctx)["vacations"]
@@ -211,10 +214,10 @@ def get_vacations():
 def get_vacation_details(vacation_id):
     if AUTH_TOKEN == "":
         return
-    ctx = requests.get(
+    ctx = session.get(
         url=f"https://school-api.yangcong345.com/vacation/student/homework/timeline/task/list"
         + f"?measuringID={vacation_id}",
-        headers=headers,
+        # headers=headers,
     )
     ctx = ctx.content.decode("utf-8")
     return json.loads(ctx)
@@ -223,12 +226,12 @@ def get_vacation_details(vacation_id):
 def get_vacation_video_detail(topic_id, task_id):
     if AUTH_TOKEN == "":
         return
-    ctx = requests.get(
+    ctx = session.get(
         url=(
             f"https://school-api.yangcong345.com/course/topics/{topic_id}/detail-video"
             + f"?taskID=f{task_id}"
         ),
-        headers=headers,
+        # headers=headers,
     )
     return json.loads(ctx.content.decode("utf-8"))
 
@@ -236,9 +239,9 @@ def get_vacation_video_detail(topic_id, task_id):
 def submit_vacation_video(topic_id, video_id, task_id, duration):
     if AUTH_TOKEN == "":
         return
-    requests.put(
+    session.put(
         url="https://school-api.yangcong345.com/vacation/student/homework/user-topic-video-record",
-        headers=headers,
+        # headers=headers,
         json={
             "taskID": task_id,
             "videoID": video_id,
@@ -255,9 +258,9 @@ def submit_vacation_practice(
 ):
     if AUTH_TOKEN == "":
         return
-    requests.post(
+    session.post(
         url="https://school-api.yangcong345.com/vacation/student/homework/user-topic-problem-record",
-        headers=headers,
+        # headers=headers,
         json={
             "taskID": task_id,
             "problemId": problem_id,
@@ -275,12 +278,12 @@ def get_vacation_stage_problem(task_id, stage_id, subject_id, homework_id):
     if AUTH_TOKEN == "":
         return
     return json.loads(
-        requests.get(
+        session.get(
             url=(
                 "https://school-api.yangcong345.com/vacation/student/homework/stage-practise"
                 + f"?taskID={task_id}&stageId={stage_id}&subjectId={subject_id}&homeworkId={homework_id}"
             ),
-            headers=headers,
+            # headers=headers,
         ).content.decode("utf-8")
     )["problems"]
 
@@ -297,9 +300,9 @@ def submit_vacation_stage_problem(
 ):
     if AUTH_TOKEN == "":
         return
-    requests.post(
+    session.post(
         url="https://school-api.yangcong345.com/vacation/student/homework/user-stage-problem-record",
-        headers=headers,
+        # headers=headers,
         json={
             "taskID": str(task_id),
             "stageId": str(stage_id),
@@ -330,9 +333,9 @@ def submit_vacation_stage_problem(
 def finalsubmit_vacation_stage_problem(task_id, problem_records):
     if AUTH_TOKEN == "":
         return
-    requests.post(
+    session.post(
         url="https://school-api.yangcong345.com/vacation/student/homework/user-stage-problem-record",
-        headers=headers,
+        # headers=headers,
         json={
             "taskID": task_id,
             "finished": True,
