@@ -233,6 +233,7 @@ def complete_vacation_task_stage(t, vc, subject_id, stage_id):
         vc["id"],
     )
     problem_details = []
+    problem_count = len(problems)
     for index, problem in enumerate(problems):
         problem_type = problem["type"]
         ans = []
@@ -264,6 +265,7 @@ def complete_vacation_task_stage(t, vc, subject_id, stage_id):
         )
         if index == len(problems) - 1:
             finalsubmit_vacation_stage_problem(t["id"], problem_details)
+        print(f"\t\t完成练习 ({index + 1}/{problem_count})")
 
 
 def complete_vacation(vc):
@@ -283,10 +285,11 @@ def complete_vacation(vc):
         for t in tasks:
             if t["type"] == 1:
                 complete_vacation_task_video(t, tl)
-            elif t["type"] == 2:
+            elif t["type"] in (2, 3):
                 complete_vacation_task_stage(
                     t, vc, subject_id=subject_id, stage_id=stage_id
                 )
+
 
 
 def run():
