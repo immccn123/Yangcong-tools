@@ -94,13 +94,16 @@ def complete_practice(homework_id, problem_list):
     for index, problem in enumerate(problem_list):
         ans = []
         problem_type = problem["type"]
-        if problem_type in ["single_choice", "exam", "multi_choice"]:
+        if problem_type in ["single_choice", "multi_choice"]:
             for choice in problem["choices"][0]:
                 if choice["correct"] == True:
                     ans.append({"body": choice["body"], "no": 0})
         elif problem_type in ["multi_blank", "single_blank", "hybrid"]:
             for s in problem["blanks"]:
                 ans.append({"body": s, "no": 0})
+        elif problem_type in ["exam"]:
+            ans.append({"body": "我答对了", "no": 0})
+            ans.append({"body": "答:", "no": 0})
         else:
             bug_report(
                 "未知问题类型 10001",
@@ -126,13 +129,16 @@ def complete_exam(group_id, problem_list):
     for index, problem in enumerate(problem_list):
         ans = []
         problem_type = problem["type"]
-        if problem_type in ["single_choice", "exam", "multi_choice"]:
+        if problem_type in ["single_choice", "multi_choice"]:
             for choice in problem["choices"][0]:
                 if choice["correct"] == True:
                     ans.append({"body": choice["body"], "no": 0})
         elif problem_type in ["multi_blank", "single_blank", "hybrid"]:
             for s in problem["blanks"]:
                 ans.append({"body": s, "no": 0})
+        elif problem_type in ["exam"]:
+            ans.append({"body": "我答对了", "no": 0})
+            ans.append({"body": "答:", "no": 0})
         else:
             bug_report(
                 "未知问题类型 10001",
@@ -200,12 +206,14 @@ def complete_vacation_task_video(t, tl):
     practices_count = len(topic["practices"])
     for index, problem in enumerate(topic["practices"]):
         problem = problem[0]
-        if problem["type"] in ["single_choice", "exam", "multi_choice"]:
+        if problem["type"] in ["single_choice", "multi_choice"]:
             for choice in problem["choices"][0]:
                 if choice["correct"] == True:
                     ans.append(choice["body"])
         elif problem["type"] in ["multi_blank", "single_blank", "hybrid"]:
             ans = problem["blanks"]
+        elif problem["type"] in ["exam"]:
+            ans = ["我答对了", "答:"]
         else:
             bug_report(
                 "未知问题类型 10001",
@@ -237,13 +245,15 @@ def complete_vacation_task_stage(t, vc, subject_id, stage_id):
     for index, problem in enumerate(problems):
         problem_type = problem["type"]
         ans = []
-        if problem_type in ["single_choice", "exam", "multi_choice"]:
+        if problem_type in ["single_choice", "multi_choice"]:
             for choice in problem["choices"][0]:
                 if choice["correct"] == True:
                     ans.append(choice["body"])
         elif problem_type in ["multi_blank", "single_blank", "hybrid"]:
             for s in problem["blanks"]:
                 ans.append(s)
+        elif problem["type"] in ["exam"]:
+            ans = ["我答对了", "答:"]
         else:
             bug_report(
                 "未知问题类型 10001",
