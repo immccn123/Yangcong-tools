@@ -1,5 +1,7 @@
 # Yangcong-tools
 
+**暂时没法用，见 [#18](/immccn123/Yangcong-tools/issues/18)**
+
 洋葱学园自动作业完成工具
 
 很明显，这个项目只对中国大陆部分学生有用，所以没有英文。
