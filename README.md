@@ -1,6 +1,6 @@
 # Yangcong-tools
 
-**暂时没法用，见 [#18](/immccn123/Yangcong-tools/issues/18)**
+**暂时没法用，见 [#18](https://github.com/immccn123/Yangcong-tools/issues/18)**
 
 洋葱学园自动作业完成工具
 
